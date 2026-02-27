@@ -117,11 +117,23 @@ const MyAppointments = () => {
 
 
 
-    useEffect(() => {
-        if (token) {
-            getUserAppointments()
-        }
-    }, [token])
+    // useEffect(() => {
+    //     if (token) {
+    //         getUserAppointments()
+    //     }
+    // }, [token])
+
+useEffect(() => {
+  if (token) {
+    getUserAppointments()
+
+    const interval = setInterval(() => {
+      getUserAppointments()
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }
+}, [token])
 
     return (
         <div>
@@ -142,15 +154,86 @@ const MyAppointments = () => {
                         </div>
                         <div></div>
                         <div className='flex flex-col gap-2 justify-end text-sm text-center'>
+                            {/* Appointment Status */}
+{/* Appointment Status (Correct Priority) */}
+
+{/* Refunded */}
+{item.refundStatus === "refunded" && (
+  <p className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-700">
+  Refund Completed
+</p>
+)}
+
+{/* Refund Processing */}
+{item.refundStatus === "processing" && (
+  <p className="text-yellow-500 text-sm font-medium">
+    Refund Processing...
+  </p>
+)}
+
+{/* Cancelled */}
+{item.cancelled &&
+ item.refundStatus !== "processing" &&
+ item.refundStatus !== "refunded" && (
+  <p className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-red-100 text-red-700">
+    Appointment Cancelled
+  </p>
+)}
+
+{/* Completed */}
+{!item.cancelled && item.isCompleted && (
+  <p className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-700">
+    Appointment Completed
+  </p>
+)}
+
+{/* Pending */}
+{!item.cancelled &&
+ !item.isCompleted &&
+ item.refundStatus !== "processing" &&
+ item.refundStatus !== "refunded" && (
+  <p className="text-yellow-500 text-xs font-medium">
+    Pending Approval
+  </p>
+)}
                             {!item.cancelled && !item.payment && !item.isCompleted && payment !== item._id && <button onClick={() => setPayment(item._id)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300'>Pay Online</button>}
                             {/*!item.cancelled && !item.payment && !item.isCompleted && payment === item._id && <button onClick={() => appointmentStripe(item._id)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-gray-100 hover:text-white transition-all duration-300 flex items-center justify-center'><img className='max-w-20 max-h-5' src={assets.stripe_logo} alt="" /></button>*/}
                             {!item.cancelled && !item.payment && !item.isCompleted && payment === item._id && <button onClick={() => appointmentRazorpay(item._id)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-gray-100 hover:text-white transition-all duration-300 flex items-center justify-center'><img className='max-w-20 max-h-5' src={assets.razorpay_logo} alt="" /></button>}
                             {!item.cancelled && item.payment && !item.isCompleted && <button className='sm:min-w-48 py-2 border rounded text-[#696969]  bg-[#EAEFFF]'>Paid</button>}
 
-                            {item.isCompleted && <button className='sm:min-w-48 py-2 border border-green-500 rounded text-green-500'>Completed</button>}
+                            {/* {item.isCompleted && <button className='sm:min-w-48 py-2 border border-green-500 rounded text-green-500'>Completed</button>} */}
 
                             {!item.cancelled && !item.isCompleted && <button onClick={() => cancelAppointment(item._id)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300'>Cancel appointment</button>}
-                            {item.cancelled && !item.isCompleted && <button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500'>Appointment cancelled</button>}
+                            {/* {item.cancelled && !item.isCompleted && <button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500'>Appointment cancelled</button>} */}
+                            
+{/* Doctor cancelled → show refund message
+{/* Doctor cancelled → refund processing 
+{item.cancelled && item.cancelledBy === "doctor" && item.refundStatus === "processing" && (
+  <div className="flex flex-col items-center gap-1">
+    <button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500'>
+      Appointment Cancelled
+    </button>
+
+    <p className="text-xs text-gray-500">
+      Refund processing...
+    </p>
+  </div>
+)}
+
+{/* Refund completed 
+{item.refundStatus === "refunded" && (
+  <button className='sm:min-w-48 py-2 border border-green-500 rounded text-green-600'>
+    Refunded ✅
+  </button>
+)}
+
+{/* User cancelled 
+{item.cancelled && item.cancelledBy === "user" && (
+  <button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500'>
+    Appointment Cancelled
+  </button>
+)} */}
+
                         </div>
                     </div>
                 ))}
